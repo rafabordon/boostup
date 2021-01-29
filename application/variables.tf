@@ -5,7 +5,7 @@ variable "environment" {
 }
 
 variable "number_webservers" {
-  default = 1
+  default = 2
 }
 
 variable "ami" {
