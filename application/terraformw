@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -e
+
+if [[ $# -lt 3 ]]; then
+  echo -e "\n\tUsage: $0 <shortname>\n\n\tExample: $0 [APPLICATION] [ENVIRONMENT] [ACTION] [OPTIONS]\n"
+  echo -e "\n\tUsage: $0 <shortname>\n\n\tExample: $0 webserver testing plan\n"
+  exit 1
+fi
+
+application="${1}"
+environment="${2}"
+subcommand="${3}"
+shift 3
+
+export TF_VAR_my_ip=`curl -s ifconfig.co`
+
+STATE_PATH="v0.12/${application}/app/terraform.tfstate"
+BUCKET="tf-states-boostup"
+WORKSPACE=${environment}
+rm -rf .terraform terraform.tfstate tfplan
+
+echo "BUCKET=$BUCKET"
+echo "STATE_PATH=$STATE_PATH"
+
+terraform init -no-color -backend-config "bucket=$BUCKET" -backend-config "key=$STATE_PATH"
+terraform get -no-color
+
+# Terraform Workspace 
+terraform workspace select ${WORKSPACE} || terraform workspace new ${WORKSPACE}
+
+case "$subcommand" in
+    destroy )
+    if terraform destroy -no-color -var "application=${application}" -var "environment=${environment}" "$@" ; then
+      echo "Terraform destroy succeeded, if it was not a TARGET DESTROY I'll remove the state file at s3://${BUCKET}/env:/${WORKSPACE}/${STATE_PATH}"
+      ARGS="$@"
+      if [[ $ARGS =~ "-target" ]]; then
+        echo "Target destroy completed, leaving the state file in peace."
+        exit 0
+      else
+        aws s3 rm "s3://${BUCKET}/env:/${WORKSPACE}/${STATE_PATH}"
+      fi;
+    fi;;
+    apply )
+        terraform plan -no-color -out=tfplan -var "application=${application}" -var "environment=${environment}" "$@"
+        terraform apply -no-color tfplan "$@" ;;
+
+    * )
+        terraform "$subcommand" -no-color -var "application=${application}" -var "environment=${environment}" "$@" ;;
+esac
+
+
+
