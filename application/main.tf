@@ -4,12 +4,6 @@
 
 data "template_file" "user-data" {
   template = file("${path.module}/templates/user_data.tpl")
-
-  vars = {
-    environment       = var.environment
-    application       = var.application
-    number_webservers = var.number_webservers
-  }
 }
 
 data "template_file" "public_key" {
