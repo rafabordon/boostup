@@ -218,7 +218,7 @@ resource "aws_security_group_rule" "allow_mongodb_ssh" {
   to_port                  = "22"
   protocol                 = "tcp"
   security_group_id        = aws_security_group.mongodb.id
-  cidr_blocks              = ["0.0.0.0/0"]
+  cidr_blocks              = [ "${var.my_ip}/32" ]
 }
 
 resource "aws_security_group_rule" "allow_mongodb_egress" {
