@@ -1,8 +1,9 @@
 **Flask APP with MongoDB**
 ***Requirements***
-This script need the user to have an aws_profile setup with permissions to create resources
+* aws_profile setup with permissions to create resources
+* Terraform v0.12 or higher
 
-**Provioning**
+**Provisioning**
 
 In order to deploy the app in an AWS account just run:
 
