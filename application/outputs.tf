@@ -11,5 +11,5 @@ output "mongo" {
 }
 
 output "ssh_private_key" {
-  value = data.template_file.private_key.rendered
+  value = "Find it at ./application/id_rsa"
 }
