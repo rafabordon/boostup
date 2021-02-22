@@ -23,3 +23,5 @@ Once Terraform has created all resources the output will show the ELB DNS that y
 You will also get the WebServers and Mongo's public IPs to connect via ssh like this:
 
 `ssh -i ./application/files/id_rsa ubuntu@[webserver_ip|mongo_ip]`
+.
+
